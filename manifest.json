@@ -1,7 +1,7 @@
 [
     {
         "name": "ProviderStuff",
-        "guid": "eb5d7894-8eef-4b36-aa6f-5d124e828ce1",
+        "guid": "7cedceba-76f2-40dd-a902-b05acf337a57",
         "version": "1.2.1.2",
         "targetAbi": "10.9.0.0",
         "framework": "net8.0",
@@ -17,7 +17,7 @@
         "versions": [
             {
                 "version": "1.2.1.2",
-                "changelog": "- Fix: assembly version 1.2.1.2 (was 0.0.0.0) so Jellyfin plugin catalog and updates work correctly\n",
+                "changelog": "- Fix: manifest guid matches plugin assembly id (plugin details page)\n- Fix: assembly version 1.2.1.2 (was 0.0.0.0) so Jellyfin plugin catalog and updates work correctly\n",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://github.com/pBrouer/jellyfin-plugin-provider-stuff/releases/download/1.2.1.2/providerstuff-1.2.1.2.zip",
                 "checksum": "441416e071204b2e0901af6cb72f3b92",
