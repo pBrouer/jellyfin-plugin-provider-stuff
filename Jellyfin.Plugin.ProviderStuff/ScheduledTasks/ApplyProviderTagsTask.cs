@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.ProviderStuff.Configuration;
+using Jellyfin.Plugin.ProviderStuff.Library;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
@@ -117,7 +118,7 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
             foreach (var provider in providersNeedingCollections)
             {
                 var collectionName = provider.Name;
-                var collections = _libraryManager.GetItemList(new InternalItemsQuery
+                var collections = _libraryManager.GetItemsList(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { BaseItemKind.BoxSet },
                     Name = collectionName,
@@ -160,7 +161,7 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
             }
         }
 
-        var items = _libraryManager.GetItemList(new InternalItemsQuery
+        var items = _libraryManager.GetItemsList(new InternalItemsQuery
         {
             IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series, BaseItemKind.Episode },
             Recursive = true
