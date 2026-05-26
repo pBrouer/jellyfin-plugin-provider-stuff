@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.ProviderStuff.Configuration;
+using Jellyfin.Plugin.ProviderStuff.Library;
 using MediaBrowser.Common.Api;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
@@ -59,13 +60,13 @@ public class ProvidersController : ControllerBase
                 string collectionId = string.Empty;
                 if (p.CreateCollection)
                 {
-                    var items = _libraryManager.GetItemList(new InternalItemsQuery
+                    var items = _libraryManager.GetItemsList(new InternalItemsQuery
                     {
                         IncludeItemTypes = new[] { BaseItemKind.BoxSet },
                         Name = p.Name,
                         Recursive = true
                     });
-                    var existing = items.FirstOrDefault();
+                    var existing = items.Count > 0 ? items[0] : null;
                     if (existing is not null)
                     {
                         collectionId = existing.Id.ToString();
@@ -122,7 +123,7 @@ public class ProvidersController : ControllerBase
         };
 
         // Get total count (could be optimized with dedicated count API if available)
-        var totalItems = _libraryManager.GetItemList(baseQuery);
+        var totalItems = _libraryManager.GetItemsList(baseQuery);
         var total = totalItems.Count;
 
         // Page query
@@ -135,7 +136,7 @@ public class ProvidersController : ControllerBase
             Limit = limit is > 0 ? limit : null
         };
 
-        var pageItems = _libraryManager.GetItemList(query);
+        var pageItems = _libraryManager.GetItemsList(query);
         var user = userId.HasValue ? _userManager.GetUserById(userId.Value) : null;
         var dtos = _dtoService.GetBaseItemDtos(pageItems, new DtoOptions(), user).ToArray();
         var result = new QueryResult<BaseItemDto>
