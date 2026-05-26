@@ -24,6 +24,7 @@ namespace Jellyfin.Plugin.ProviderStuff.ScheduledTasks;
 public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
 {
     private readonly ILibraryManager _libraryManager;
+    private readonly IProviderManager _providerManager;
     private readonly ILogger<ApplyProviderTagsTask> _logger;
     private readonly ProviderService _providerService;
     private readonly IConfigurationManager _config;
@@ -36,10 +37,12 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
     /// <param name="logger">The logger to record diagnostic and error messages.</param>
     /// <param name="providerService">The service used to fetch provider IDs from TMDB.</param>
     /// <param name="config">The configuration manager to access plugin settings.</param>
+    /// <param name="providerManager">Downloads and saves remote images.</param>
     /// <param name="collectionManager">The collection manager for creating and updating collections.</param>
-    public ApplyProviderTagsTask(ILibraryManager libraryManager, ILogger<ApplyProviderTagsTask> logger, ProviderService providerService, IConfigurationManager config, ICollectionManager collectionManager)
+    public ApplyProviderTagsTask(ILibraryManager libraryManager, IProviderManager providerManager, ILogger<ApplyProviderTagsTask> logger, ProviderService providerService, IConfigurationManager config, ICollectionManager collectionManager)
     {
         _libraryManager = libraryManager;
+        _providerManager = providerManager;
         _logger = logger;
         _providerService = providerService;
         _config = config;
@@ -235,32 +238,25 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
         }
 
         var url = provider.ProviderLogoUrl.Trim();
-        _logger.LogInformation("Setting primary image for collection '{Name}' from {Url}", collection.Name, url);
-
-        // Add as remote image first
-        var remoteImage = new ItemImageInfo
+        if (!Uri.TryCreate(url, UriKind.Absolute, out _))
         {
-            Path = url,
-            Type = ImageType.Primary,
-            DateModified = DateTime.UtcNow
-        };
+            _logger.LogWarning("Provider logo URL for '{Name}' is not absolute, skipping image: {Url}", collection.Name, url);
+            return;
+        }
 
-        collection.AddImage(remoteImage);
-
-        // Persist image info
-        await _libraryManager.UpdateItemAsync(collection, collection, ItemUpdateType.ImageUpdate, ct).ConfigureAwait(false);
+        _logger.LogInformation("Setting primary image for collection '{Name}' from {Url}", collection.Name, url);
 
         try
         {
-            // Convert to local so it survives and benefits from caching/processing
-            var index = collection.GetImageIndex(remoteImage);
-            await _libraryManager.ConvertImageToLocal(collection, remoteImage, index, removeOnFailure: true).ConfigureAwait(false);
+            // SaveImage downloads directly; ConvertImageToLocal fails on 10.11+ after UpdateItemAsync
+            // because ItemImageInfo.Path is no longer the remote URL.
+            await _providerManager.SaveImage(collection, url, ImageType.Primary, 0, ct).ConfigureAwait(false);
             await _libraryManager.UpdateImagesAsync(collection, forceUpdate: true).ConfigureAwait(false);
             _logger.LogInformation("Primary image set for collection '{Name}'", collection.Name);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to convert image to local for collection '{Name}'", collection.Name);
+            _logger.LogError(ex, "Failed to download collection image for '{Name}'", collection.Name);
         }
     }
 
