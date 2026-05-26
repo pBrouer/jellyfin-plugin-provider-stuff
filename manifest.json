@@ -2,7 +2,7 @@
     {
         "name": "ProviderStuff",
         "guid": "eb5d7894-8eef-4b36-aa6f-5d124e828ce1",
-        "version": "1.2.1.1",
+        "version": "1.2.1.2",
         "targetAbi": "10.9.0.0",
         "framework": "net8.0",
         "overview": "Applies provider tags, manages provider collections, and exposes provider/item APIs with pagination.",
@@ -12,15 +12,23 @@
         "artifacts": [
             "Jellyfin.Plugin.ProviderStuff.dll"
         ],
-        "changelog": "- Jellyfin 10.11+ compatibility; config page button styling",
+        "changelog": "- Fix: assembly version matches release (plugin catalog / updates)\n- Jellyfin 10.11+ compatibility; config page button styling",
         "imageUrl": "",
         "versions": [
+            {
+                "version": "1.2.1.2",
+                "changelog": "- Fix: assembly version 1.2.1.2 (was 0.0.0.0) so Jellyfin plugin catalog and updates work correctly\n",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/pBrouer/jellyfin-plugin-provider-stuff/releases/download/1.2.1.2/providerstuff-1.2.1.2.zip",
+                "checksum": "441416e071204b2e0901af6cb72f3b92",
+                "timestamp": "2026-05-27T18:00:00Z"
+            },
             {
                 "version": "1.2.1.1",
                 "changelog": "- Fix: config page button colors on Jellyfin dark theme\n",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://github.com/pBrouer/jellyfin-plugin-provider-stuff/releases/download/1.2.1.1/providerstuff-1.2.1.1.zip",
-                "checksum": "76a8aaad9a0b363af0c47f4dc0d324ec",
+                "checksum": "6b5a5ac4607c3493040c6be1ac3bb12f",
                 "timestamp": "2026-05-27T12:00:00Z"
             },
             {
